@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学 Vもぎ対策オリジナル問題（練習用）</title>
+<style>
+  :root {
+    --main: #2f9e5c;
+    --main-dark: #1e6b3e;
+    --bg: #f2f9f4;
+    --card: #ffffff;
+    --correct: #1a7a3c;
+    --wrong: #b3261e;
+    --lead-bg: #eaf5ee;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 0;
+    color: #222;
+    line-height: 1.7;
+  }
+  header {
+    background: linear-gradient(135deg, var(--main-dark), var(--main));
+    color: white;
+    padding: 22px 16px 26px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 4px; font-size: 1.4rem; }
+  header p { margin: 0; font-size: 0.85rem; opacity: 0.9; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+  .timer-bar {
+    background: white; border-radius: 10px; padding: 10px 14px; margin: -16px auto 16px;
+    max-width: 760px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .timer-bar span { font-size: 0.85rem; color: #555; }
+  #timerDisplay { font-weight: bold; color: var(--main-dark); font-size: 1.1rem; }
+  .timer-bar button {
+    background: var(--main); color: white; border: none; border-radius: 6px;
+    padding: 6px 12px; font-size: 0.8rem; cursor: pointer;
+  }
+  .name-bar {
+    background: white; border-radius: 10px; padding: 10px 14px; margin: 0 auto 16px;
+    max-width: 760px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.85rem; color: #555;
+  }
+  .name-bar input { border: 1px solid #ccc; border-radius: 6px; padding: 5px 8px; font-size: 0.85rem; }
+  .section-card {
+    background: var(--card); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .section-title {
+    background: var(--main); color: white; padding: 10px 14px; border-radius: 8px;
+    font-weight: bold; font-size: 1.02rem; margin-bottom: 12px;
+  }
+  .section-lead {
+    background: var(--lead-bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;
+    font-size: 0.92rem; color: #444;
+  }
+  .item { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #ddd; }
+  .item:last-child { border-bottom: none; margin-bottom: 0; }
+  .item-lead { background: var(--lead-bg); border-radius: 8px; padding: 8px 10px; font-size: 0.88rem; color: #555; margin-bottom: 6px; }
+  .item-title { font-weight: bold; font-size: 0.88rem; color: var(--main-dark); margin-bottom: 2px; }
+  .qtext { font-weight: bold; margin-bottom: 8px; font-size: 0.97rem; }
+  .qtag { display:inline-block; font-size:0.72rem; background:#e3f3e8; color:var(--main-dark); border-radius:4px; padding:1px 6px; margin-right:6px; font-weight:normal; }
+  .choice-label {
+    display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 8px;
+    margin-bottom: 6px; cursor: pointer; border: 1px solid #e2e5ec; transition: background 0.15s;
+  }
+  .choice-label:hover { background: #eef8f1; }
+  .choice-label input { margin-top: 3px; flex-shrink: 0; }
+  .choice-mark { font-weight: bold; color: var(--main-dark); margin-right: 2px; }
+  textarea {
+    width: 100%; min-height: 70px; border-radius: 8px; border: 1px solid #ccc; padding: 8px;
+    font-family: inherit; font-size: 0.92rem; resize: vertical;
+  }
+  .reveal-btn, .self-btn {
+    margin-top: 6px; background: #e3f3e8; color: var(--main-dark); border: 1px solid var(--main);
+    border-radius: 6px; padding: 5px 10px; font-size: 0.8rem; cursor: pointer; margin-right: 6px;
+  }
+  .self-btn.active-ok { background: var(--correct); color: white; border-color: var(--correct); }
+  .self-btn.active-ng { background: var(--wrong); color: white; border-color: var(--wrong); }
+  .sample-box {
+    display: none; margin-top: 8px; background: #eafaf0; border-left: 4px solid var(--correct);
+    padding: 8px 10px; font-size: 0.88rem; border-radius: 4px;
+  }
+  .result-box { display: none; margin-top: 8px; padding: 8px 10px; border-radius: 6px; font-size: 0.88rem; }
+  .result-correct { background: #eafaf0; border-left: 4px solid var(--correct); color: #185c30; }
+  .result-wrong { background: #fdecea; border-left: 4px solid var(--wrong); color: #8c2a22; }
+  .grade-bar {
+    position: sticky; bottom: 0; background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+    padding: 12px 16px; text-align: center; z-index: 10; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+  }
+  .grade-btn {
+    background: var(--main); color: white; border: none; border-radius: 24px;
+    padding: 12px 28px; font-size: 1rem; font-weight: bold; cursor: pointer;
+  }
+  .save-btn {
+    background: #1a7a3c; color: white; border: none; border-radius: 24px;
+    padding: 12px 28px; font-size: 1rem; font-weight: bold; cursor: pointer; display:none;
+  }
+  .grade-btn:active, .save-btn:active { transform: scale(0.97); }
+  #scoreSummary {
+    max-width: 760px; margin: 0 auto 16px; background: white; border-radius: 12px; padding: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: none;
+  }
+  #scoreSummary .headline { text-align:center; }
+  #scoreSummary .big { font-size: 2rem; font-weight: bold; color: var(--main-dark); }
+  #fieldTable { width:100%; border-collapse: collapse; margin-top: 14px; font-size: 0.85rem; }
+  #fieldTable th, #fieldTable td { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; }
+  #fieldTable th { color: #888; font-weight: normal; }
+  .weak-tag { display:inline-block; background:#fdecea; color:var(--wrong); border-radius:4px; padding:2px 7px; margin:2px 4px 2px 0; font-size:0.78rem; }
+  .footer-note { text-align: center; font-size: 0.75rem; color: #999; padding: 20px 16px 40px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>数学　Vもぎ対策オリジナル問題（練習用）</h1>
+  <p>Vもぎ（都立版）8月号の出題範囲にもとづくオリジナル問題　全19問</p>
+</header>
+
+<div class="timer-bar">
+  <span>目安時間 50分　経過：<span id="timerDisplay">00:00</span></span>
+  <div>
+    <button onclick="startTimer()">開始</button>
+    <button onclick="resetTimer()">リセット</button>
+  </div>
+</div>
+
+<div class="name-bar">
+  名前：<input type="text" id="studentName" placeholder="（任意）記録用の名前">
+</div>
+
+<div class="wrap" id="quizRoot"></div>
+
+<div id="scoreSummary">
+  <div class="headline">
+    <div>選択式の正答数</div>
+    <div class="big"><span id="scoreNum">0</span> / <span id="scoreTotal">0</span></div>
+    <div style="font-size:0.85rem;color:#666;margin-top:6px;">記述問題は解答例と見比べて、問題ごとの「できた／もう一息」ボタンで自己評価してください。</div>
+  </div>
+  <table id="fieldTable"><thead><tr><th>分野</th><th>正答</th><th>問題数</th><th>正答率</th></tr></thead><tbody></tbody></table>
+  <div id="weakList" style="margin-top:10px;"></div>
+</div>
+
+<div class="grade-bar">
+  <button class="grade-btn" onclick="gradeAll()">採点する</button>
+  <button class="save-btn" id="saveBtn" onclick="saveResults()">結果を保存する</button>
+</div>
+
+<div class="footer-note">この問題は過去問そのものではなく、出題傾向分析に基づき新規作成したオリジナル問題です。保存した結果ファイルをClaudeに見せると、苦手分野に合わせた次の問題を作れます。</div>
+
+<script>
+const SECTIONS = [{"id": "q1", "title": "大問1　次の各問に答えよ。", "lead": null, "items": [{"kind": "write", "field": "計算", "topic": "正負の数の計算", "no": 1, "q": "8-2×(-3)² を計算せよ。", "sample": "-10"}, {"kind": "write", "field": "計算", "topic": "文字式の計算", "no": 2, "q": "(3a+2b)/4 - (a-4b)/8 を計算せよ。", "sample": "(5a+8b)/8"}, {"kind": "write", "field": "計算", "topic": "多項式の計算", "no": 3, "q": "(x+4)(x-6) を展開せよ。", "sample": "x²-2x-24"}, {"kind": "write", "field": "方程式", "topic": "一次方程式", "no": 4, "q": "一次方程式 2(x-3)=5x+9 を解け。", "sample": "x=-5"}, {"kind": "write", "field": "方程式", "topic": "連立方程式", "no": 5, "q": "連立方程式 { x+2y=1 , 3x-y=10 } を解け。", "sample": "x=3, y=-1"}, {"kind": "write", "field": "関数", "topic": "一次関数", "no": 6, "q": "関数 y=-2x+3 について、xの変域が -1≦x≦4 のときのyの変域を求めよ。", "sample": "-5≦y≦5"}, {"kind": "write", "field": "データの活用", "topic": "確率", "no": 7, "q": "大小2つのさいころを同時に投げるとき、出た目の数の和が8になる確率を求めよ。ただし、どちらのさいころも1から6までのどの目が出ることも同様に確からしいものとする。", "sample": "5/36"}, {"kind": "write", "field": "図形", "topic": "平行線と角度", "no": 8, "q": "直線ℓと直線mは平行である。直線ℓ上の点Aと直線m上の点Bを、折れ点Pで結んだ線分ABがある。∠（Aでの角）=35°，∠（Bでの角）=50°のとき、∠APBの大きさを求めよ。", "sample": "85°", "lead": "<svg viewBox=\"0 0 260 200\" style=\"width:230px;max-width:100%;display:block;margin:6px auto;\">\n<line x1=\"10\" y1=\"40\" x2=\"250\" y2=\"40\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"10\" y1=\"160\" x2=\"250\" y2=\"160\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"40\" y1=\"40\" x2=\"120\" y2=\"100\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"120\" y1=\"100\" x2=\"220\" y2=\"160\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<text x=\"255\" y=\"44\" font-size=\"13\">l</text>\n<text x=\"255\" y=\"164\" font-size=\"13\">m</text>\n<text x=\"32\" y=\"34\" font-size=\"13\">A</text>\n<text x=\"224\" y=\"176\" font-size=\"13\">B</text>\n<text x=\"102\" y=\"104\" font-size=\"13\">P</text>\n<circle cx=\"40\" cy=\"40\" r=\"2.3\" fill=\"#333\"/>\n<circle cx=\"220\" cy=\"160\" r=\"2.3\" fill=\"#333\"/>\n<circle cx=\"120\" cy=\"100\" r=\"2.3\" fill=\"#333\"/>\n<text x=\"46\" y=\"60\" font-size=\"12\">35°</text>\n<text x=\"186\" y=\"152\" font-size=\"12\">50°</text>\n</svg>"}, {"kind": "write", "field": "図形", "topic": "空間図形の基礎（ねじれの位置）", "no": 9, "q": "直方体ABCD-EFGH（頂点Aの真上に頂点E、頂点Bの真上に頂点Fとなるように並んでいる）で、辺ABとねじれの位置にある辺は何本あるか求めよ。", "sample": "4本", "lead": "<svg viewBox=\"0 0 240 220\" style=\"width:210px;max-width:100%;display:block;margin:6px auto;\">\n<line x1=\"60.0\" y1=\"190.0\" x2=\"150.0\" y2=\"190.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"150.0\" y1=\"190.0\" x2=\"200.0\" y2=\"150.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"60.0\" y1=\"90.0\" x2=\"150.0\" y2=\"90.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"150.0\" y1=\"90.0\" x2=\"200.0\" y2=\"50.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"200.0\" y1=\"50.0\" x2=\"110.0\" y2=\"50.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"60.0\" y1=\"190.0\" x2=\"60.0\" y2=\"90.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"150.0\" y1=\"190.0\" x2=\"150.0\" y2=\"90.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"200.0\" y1=\"150.0\" x2=\"200.0\" y2=\"50.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"110.0\" y1=\"150.0\" x2=\"60.0\" y2=\"190.0\" stroke=\"#333\" stroke-width=\"1.1\" stroke-dasharray=\"4,3\"/>\n<line x1=\"110.0\" y1=\"150.0\" x2=\"200.0\" y2=\"150.0\" stroke=\"#333\" stroke-width=\"1.1\" stroke-dasharray=\"4,3\"/>\n<line x1=\"110.0\" y1=\"150.0\" x2=\"110.0\" y2=\"50.0\" stroke=\"#333\" stroke-width=\"1.1\" stroke-dasharray=\"4,3\"/>\n<circle cx=\"60.0\" cy=\"190.0\" r=\"2.3\" fill=\"#333\"/><text x=\"48.0\" y=\"194.0\" font-size=\"12\">A</text>\n<circle cx=\"150.0\" cy=\"190.0\" r=\"2.3\" fill=\"#333\"/><text x=\"154.0\" y=\"204.0\" font-size=\"12\">B</text>\n<circle cx=\"200.0\" cy=\"150.0\" r=\"2.3\" fill=\"#333\"/><text x=\"206.0\" y=\"154.0\" font-size=\"12\">C</text>\n<circle cx=\"110.0\" cy=\"150.0\" r=\"2.3\" fill=\"#333\"/><text x=\"96.0\" y=\"148.0\" font-size=\"12\">D</text>\n<circle cx=\"60.0\" cy=\"90.0\" r=\"2.3\" fill=\"#333\"/><text x=\"48.0\" y=\"86.0\" font-size=\"12\">E</text>\n<circle cx=\"150.0\" cy=\"90.0\" r=\"2.3\" fill=\"#333\"/><text x=\"156.0\" y=\"86.0\" font-size=\"12\">F</text>\n<circle cx=\"200.0\" cy=\"50.0\" r=\"2.3\" fill=\"#333\"/><text x=\"206.0\" y=\"44.0\" font-size=\"12\">G</text>\n<circle cx=\"110.0\" cy=\"50.0\" r=\"2.3\" fill=\"#333\"/><text x=\"104.0\" y=\"40.0\" font-size=\"12\">H</text>\n</svg>"}]}, {"id": "q2", "title": "大問2　Sさんのクラスでは、先生が示した問題をみんなで考えた。次の各問に答えよ。", "lead": "［先生が示した問題］連続する4つの整数のうち、最も小さい数をnとする。中央の2つの数の積をA、両端の2つの数の積をBとするとき、A-Bの値を考える。例えば、n=5のとき、4つの整数は5,6,7,8であり、A=6×7=42、B=5×8=40となる。このとき、A-B=42-40=2である。", "items": [{"kind": "write", "field": "数の性質", "topic": "数の性質・文字式の証明", "no": 1, "q": "n=12のとき、A-Bの値を求めよ。", "sample": "2"}, {"kind": "write", "field": "証明", "topic": "文字式の証明", "no": 2, "q": "kを正の整数とする。連続する4つの数を、隣り合う数の差がkであるn, n+k, n+2k, n+3k とする（nは整数）。中央の2つの数の積をC、両端の2つの数の積をDとするとき、C-D=2k² となることを証明せよ。", "sample": "C=(n+k)(n+2k)=n²+3nk+2k²、D=n(n+3k)=n²+3nk。C-D=(n²+3nk+2k²)-(n²+3nk)=2k²。よってC-D=2k²が成り立つ。"}]}, {"id": "q3", "title": "大問3　点Oは原点、点Aの座標は(6,-2)であり、直線lは一次関数 y=(1/3)x+4 のグラフを表している。直線lとx軸との交点をBとする。直線l上にある点をPとし、2点A,Pを通る直線をmとする。次の各問に答えよ。", "lead": null, "items": [{"kind": "choice", "field": "関数", "topic": "一次関数", "no": 1, "q": "点Pのy座標が2のとき、点Pのx座標を、次のうちから選べ。", "choices": ["-12", "-6", "-2", "6"], "answer": 1, "explain": "y=(1/3)x+4 に y=2 を代入すると、2=(1/3)x+4 → x=-6"}, {"kind": "write", "field": "関数", "topic": "一次関数・直線の式", "no": 2, "q": "点Pのx座標が0のとき、直線mの式を y=③x+④ の形で求めよ。", "sample": "y=-x+4"}, {"kind": "write", "field": "関数", "topic": "一次関数と面積比", "no": 3, "q": "点Pのx座標が6より大きい数であるとき、x軸上にありx座標が点Pのx座標と等しい点をQとし、点Aと点B、点Aと点Q、点Pと点Qをそれぞれ結んだ場合を考える。△APBの面積が△AQPの面積の2倍になるとき、点Pのx座標を求めよ。", "sample": "x=18"}]}, {"id": "q4", "title": "大問4　四角形ABCDは平行四辺形である。対角線AC，BDの交点をOとする。点Oを通る直線を引き、辺ABとの交点をP、辺CDとの交点をQとする（P，Qは頂点に一致しない）。次の各問に答えよ。", "lead": "<svg viewBox=\"0 0 260 180\" style=\"width:230px;max-width:100%;display:block;margin:6px auto;\">\n<polyline points=\"30,150 80,30 230,30 180,150 30,150\" fill=\"none\" stroke=\"#333\" stroke-width=\"1.4\"/>\n<line x1=\"30\" y1=\"150\" x2=\"230\" y2=\"30\" stroke=\"#333\" stroke-width=\"1\"/>\n<line x1=\"80\" y1=\"30\" x2=\"180\" y2=\"150\" stroke=\"#333\" stroke-width=\"1\"/>\n<line x1=\"63.3\" y1=\"70.0\" x2=\"196.7\" y2=\"110.0\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<circle cx=\"30.0\" cy=\"150.0\" r=\"2.3\" fill=\"#333\"/><text x=\"16.0\" y=\"154.0\" font-size=\"13\">A</text>\n<circle cx=\"80.0\" cy=\"30.0\" r=\"2.3\" fill=\"#333\"/><text x=\"74.0\" y=\"22.0\" font-size=\"13\">B</text>\n<circle cx=\"230.0\" cy=\"30.0\" r=\"2.3\" fill=\"#333\"/><text x=\"236.0\" y=\"22.0\" font-size=\"13\">C</text>\n<circle cx=\"180.0\" cy=\"150.0\" r=\"2.3\" fill=\"#333\"/><text x=\"188.0\" y=\"154.0\" font-size=\"13\">D</text>\n<circle cx=\"130.0\" cy=\"90.0\" r=\"2.3\" fill=\"#333\"/><text x=\"136.0\" y=\"100.0\" font-size=\"13\">O</text>\n<circle cx=\"63.3\" cy=\"70.0\" r=\"2.3\" fill=\"#333\"/><text x=\"49.3\" y=\"68.0\" font-size=\"13\">P</text>\n<circle cx=\"196.7\" cy=\"110.0\" r=\"2.3\" fill=\"#333\"/><text x=\"204.7\" y=\"114.0\" font-size=\"13\">Q</text>\n</svg>", "items": [{"kind": "choice", "field": "図形", "topic": "平行線と角度", "no": 1, "q": "∠OAP=a°，∠OPA=b°とするとき、∠OQCの大きさを表す式を、次のうちから選べ。", "choices": ["a度", "b度", "(180-a-b)度", "(a+b)度"], "answer": 1, "explain": "△AOPで∠AOP=180-a-b。対頂角より∠COQ=180-a-b。錯角（AB∥DC）より∠OCQ=∠OAP=a。△COQの内角の和より∠OQC=180-a-(180-a-b)=b"}, {"kind": "write", "field": "証明", "topic": "合同の証明", "no": "2-1", "q": "△AOP と △COQ が合同（△AOP≡△COQ）であることを証明せよ。", "sample": "平行四辺形の対角線はそれぞれの中点で交わるからAO=CO…①。AB∥DCより錯角が等しいから∠OAP=∠OCQ…②。対頂角は等しいから∠AOP=∠COQ…③。①②③より1組の辺とその両端の角がそれぞれ等しいから△AOP≡△COQ。"}, {"kind": "write", "field": "図形", "topic": "合同の性質の利用", "no": "2-2", "q": "AB=14cm，AP=9cmのとき、線分PBの長さと線分CQの長さをそれぞれ求めよ。", "sample": "PB=5cm、CQ=9cm"}]}, {"id": "q5", "title": "大問5　図1・図2について、次の各問に答えよ。円周率はπとする。", "lead": null, "items": [{"kind": "write", "field": "空間図形", "topic": "空間図形・体積", "no": 1, "q": "底面の半径が3cm，高さが8cmの円柱の体積を求めよ。", "sample": "72π cm³", "lead": "<svg viewBox=\"0 0 200 200\" style=\"width:150px;max-width:100%;display:block;margin:6px auto;\">\n<ellipse cx=\"100\" cy=\"40\" rx=\"60\" ry=\"18\" fill=\"none\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"40\" y1=\"40\" x2=\"40\" y2=\"140\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"160\" y1=\"40\" x2=\"160\" y2=\"140\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<path d=\"M40,140 A60,18 0 0 0 160,140\" fill=\"none\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<path d=\"M40,40 A60,18 0 0 0 160,40\" fill=\"none\" stroke=\"#333\" stroke-width=\"1\" stroke-dasharray=\"3,3\"/>\n<text x=\"55\" y=\"95\" font-size=\"12\">8cm</text>\n<text x=\"90\" y=\"34\" font-size=\"12\">3cm</text>\n</svg>"}, {"kind": "write", "field": "空間図形", "topic": "空間図形・表面積", "no": 2, "q": "底面の半径が4cm，母線の長さが9cmの円錐の側面積を求めよ。", "sample": "36π cm²", "lead": "<svg viewBox=\"0 0 200 170\" style=\"width:150px;max-width:100%;display:block;margin:6px auto;\">\n<ellipse cx=\"100\" cy=\"140\" rx=\"55\" ry=\"16\" fill=\"none\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"45\" y1=\"140\" x2=\"100\" y2=\"30\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<line x1=\"155\" y1=\"140\" x2=\"100\" y2=\"30\" stroke=\"#333\" stroke-width=\"1.3\"/>\n<path d=\"M45,140 A55,16 0 0 0 155,140\" fill=\"none\" stroke=\"#333\" stroke-width=\"1\" stroke-dasharray=\"3,3\"/>\n<text x=\"112\" y=\"90\" font-size=\"12\">9cm</text>\n<text x=\"88\" y=\"160\" font-size=\"12\">4cm</text>\n</svg>"}]}];
+const MARUS = ["ア","イ","ウ","エ"];
+const root = document.getElementById('quizRoot');
+
+function renderChoiceItem(sec, item) {
+  let html = `<div class="item" data-kind="choice" data-field="${item.field||''}" data-topic="${item.topic||''}" data-answer="${item.answer}" id="item-${sec.id}-${item.no}">`;
+  if (item.title) html += `<div class="item-title">${item.title}</div>`;
+  if (item.lead) html += `<div class="item-lead">${item.lead}</div>`;
+  html += `<div class="qtext"><span class="qtag">${item.field||''}</span>〔問${item.no}〕 ${item.q}</div>`;
+  item.choices.forEach((c, i) => {
+    html += `<label class="choice-label">
+      <input type="radio" name="ans-${sec.id}-${item.no}" value="${i}">
+      <span><span class="choice-mark">${MARUS[i]}</span>${c}</span>
+    </label>`;
+  });
+  html += `<div class="result-box" id="result-${sec.id}-${item.no}"></div>`;
+  html += `</div>`;
+  return html;
+}
+
+function renderWriteItem(sec, item) {
+  const uid = `${sec.id}-${item.no}`;
+  let html = `<div class="item" data-kind="write" data-field="${item.field||''}" data-topic="${item.topic||''}" id="item-${uid}">`;
+  if (item.title) html += `<div class="item-title">${item.title}</div>`;
+  if (item.lead) html += `<div class="item-lead">${item.lead}</div>`;
+  html += `<div class="qtext"><span class="qtag">${item.field||''}</span>〔問${item.no}〕 ${item.q}</div>`;
+  html += `<textarea id="write-${uid}" placeholder="ここに答えを書いてみよう"></textarea>`;
+  html += `<div><button class="reveal-btn" onclick="toggleSample('${uid}')">解答例を見る</button>
+    <button class="self-btn" id="ok-${uid}" onclick="setSelf('${uid}','ok')">できた</button>
+    <button class="self-btn" id="ng-${uid}" onclick="setSelf('${uid}','ng')">もう一息</button></div>`;
+  html += `<div class="sample-box" id="sample-${uid}">【解答例】${item.sample}</div>`;
+  html += `</div>`;
+  return html;
+}
+
+function toggleSample(uid) {
+  const box = document.getElementById(`sample-${uid}`);
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+const selfRatings = {};
+function setSelf(uid, rating) {
+  selfRatings[uid] = rating;
+  const ok = document.getElementById(`ok-${uid}`);
+  const ng = document.getElementById(`ng-${uid}`);
+  ok.classList.toggle('active-ok', rating === 'ok');
+  ng.classList.toggle('active-ng', rating === 'ng');
+}
+
+SECTIONS.forEach(sec => {
+  let html = `<div class="section-card"><div class="section-title">${sec.title}</div>`;
+  if (sec.lead) html += `<div class="section-lead">${sec.lead}</div>`;
+  sec.items.forEach(item => {
+    html += item.kind === 'choice' ? renderChoiceItem(sec, item) : renderWriteItem(sec, item);
+  });
+  html += `</div>`;
+  root.insertAdjacentHTML('beforeend', html);
+});
+
+let lastResult = null;
+
+function gradeAll() {
+  let correct = 0, total = 0;
+  const byField = {};
+  const weakTopics = [];
+  const detail = [];
+
+  SECTIONS.forEach(sec => {
+    sec.items.forEach(item => {
+      const uid = `${sec.id}-${item.no}`;
+      const field = item.field || '未分類';
+      if (!byField[field]) byField[field] = {correct:0, total:0};
+
+      if (item.kind === 'choice') {
+        total++;
+        byField[field].total++;
+        const sel = document.querySelector(`input[name="ans-${uid}"]:checked`);
+        const box = document.getElementById(`result-${uid}`);
+        box.style.display = 'block';
+        const isCorrect = sel && parseInt(sel.value) === item.answer;
+        if (isCorrect) {
+          correct++;
+          byField[field].correct++;
+          box.className = 'result-box result-correct';
+          box.textContent = `正解！ 【解説】${item.explain}`;
+        } else {
+          box.className = 'result-box result-wrong';
+          const chosen = sel ? MARUS[parseInt(sel.value)] : '未回答';
+          box.textContent = `不正解（あなたの回答：${chosen} / 正解：${MARUS[item.answer]}） 【解説】${item.explain}`;
+          weakTopics.push(item.topic || field);
+        }
+        detail.push({section: sec.id, no: item.no, kind: 'choice', field, topic: item.topic,
+                      chosen: sel ? MARUS[parseInt(sel.value)] : null, correctAnswer: MARUS[item.answer], isCorrect: !!isCorrect});
+      } else {
+        const uid2 = uid;
+        const rating = selfRatings[uid2] || null;
+        if (rating === 'ng') weakTopics.push(item.topic || field);
+        detail.push({section: sec.id, no: item.no, kind: 'write', field, topic: item.topic,
+                      answerText: (document.getElementById(`write-${uid2}`)||{}).value || '', selfRating: rating});
+      }
+    });
+  });
+
+  document.getElementById('scoreNum').textContent = correct;
+  document.getElementById('scoreTotal').textContent = total;
+
+  const tbody = document.querySelector('#fieldTable tbody');
+  tbody.innerHTML = '';
+  Object.keys(byField).forEach(f => {
+    const d = byField[f];
+    const rate = d.total ? Math.round(d.correct/d.total*100) : 0;
+    tbody.insertAdjacentHTML('beforeend', `<tr><td>${f}</td><td>${d.correct}</td><td>${d.total}</td><td>${rate}%</td></tr>`);
+  });
+
+  const weakList = document.getElementById('weakList');
+  if (weakTopics.length) {
+    const uniq = [...new Set(weakTopics)];
+    weakList.innerHTML = '苦手そうな単元：' + uniq.map(t => `<span class="weak-tag">${t}</span>`).join('');
+  } else {
+    weakList.innerHTML = '';
+  }
+
+  document.getElementById('scoreSummary').style.display = 'block';
+  document.getElementById('scoreSummary').scrollIntoView({behavior:'smooth'});
+  document.getElementById('saveBtn').style.display = 'inline-block';
+
+  lastResult = {
+    examTitle: "数学Vもぎ対策オリジナル問題（8月号出題範囲ベース）",
+    studentName: document.getElementById('studentName').value || null,
+    date: new Date().toISOString(),
+    elapsedSeconds: elapsed,
+    choiceScore: {correct, total},
+    byField,
+    weakTopics: [...new Set(weakTopics)],
+    detail
+  };
+}
+
+async function saveResults() {
+  if (!lastResult) return;
+  const filename = `Vもぎ数学結果_${lastResult.date.slice(0,10)}_${String(new Date().getHours()).padStart(2,'0')}${String(new Date().getMinutes()).padStart(2,'0')}.json`;
+  const text = JSON.stringify(lastResult, null, 2);
+
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{description: 'JSON', accept: {'application/json': ['.json']}}]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(text);
+      await writable.close();
+      alert('保存しました。次回はこのファイルをClaudeに見せてください。');
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      // フォールバックへ
+    }
+  }
+  const blob = new Blob([text], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+let timerInterval = null;
+let elapsed = 0;
+function startTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    elapsed++;
+    const m = String(Math.floor(elapsed/60)).padStart(2,'0');
+    const s = String(elapsed%60).padStart(2,'0');
+    document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+  }, 1000);
+}
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  elapsed = 0;
+  document.getElementById('timerDisplay').textContent = '00:00';
+}
+</script>
+</body>
+</html>
